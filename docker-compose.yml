@@ -1,0 +1,58 @@
+version: "3.8"
+
+services:
+  redis: 
+    image: redis
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - redis:/usr/local/etc/redis
+  memcached:
+    image: bitnami/memcached:latest
+    environment:
+      - MEMCACHED_CACHE_SIZE=512
+    ports:
+      - 11211:11211
+    command: /opt/bitnami/scripts/memcached/run.sh -vvv
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - db:/data/db
+  web-app-01:
+    depends_on:
+      - mongo
+    build: .
+    container_name: web_app_01
+    restart: always
+    ports:
+      - 3001:3000
+    links:
+      - mongo
+    stdin_open: true
+    tty: true
+  web-app-02:
+    depends_on:
+      - mongo
+    build: .
+    container_name: web_app_02
+    restart: always
+    ports:
+      - 3002:3000
+    links:
+      - mongo
+    stdin_open: true
+    tty: true
+  nginx_loadbalancer:
+    build: ./nginx
+    ports:
+     - 80:80
+    depends_on:
+      - web-app-02
+      - web-app-01
+volumes:
+  db:
+  redis:
