@@ -11,6 +11,9 @@ app.get("/", (req, res) => {
   res.send("API Works!");
 });
 
+app.get('/github',(req, res) => {
+  res.send("deploy successfully deployed")
+})
 app.get("/social", (req, res) => {
   res.send(mockData);
 });
